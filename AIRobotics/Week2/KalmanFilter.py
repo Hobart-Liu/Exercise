@@ -178,6 +178,13 @@ H = matrix([[1., 0.]]) # measurement function
 R = matrix([[1.]]) # measurement uncertainty
 I = matrix([[1., 0.], [0., 1.]]) # identity matrix
 
+P.show()
+F.show()
+H.show()
+R.show()
+I.show()
+
+
 
 print kalman_filter(x, P)
 # output should be:
