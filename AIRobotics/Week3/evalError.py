@@ -1,23 +1,10 @@
-# Make a robot called myrobot that starts at
-# coordinates 30, 50 heading north (pi/2).
-# Have your robot turn clockwise by pi/2, move
-# 15 m, and sense. Then have it turn clockwise
-# by pi/2 again, move 10 m, and sense again.
-#
-# Your program should print out the result of
-# your two sense measurements.
-#
-# Don't modify the code below. Please enter
-# your code at the bottom.
+# Please only modify the indicated area below!
 
 from math import *
 import random
 
-
-
 landmarks  = [[20.0, 20.0], [80.0, 80.0], [20.0, 80.0], [80.0, 20.0]]
 world_size = 100.0
-
 
 class robot:
     def __init__(self):
@@ -93,9 +80,7 @@ class robot:
             dist = sqrt((self.x - landmarks[i][0]) ** 2 + (self.y - landmarks[i][1]) ** 2)
             prob *= self.Gaussian(dist, self.sense_noise, measurement[i])
         return prob
-    
-    
-    
+      
     def __repr__(self):
         return '[x=%.6s y=%.6s orient=%.6s]' % (str(self.x), str(self.y), str(self.orientation))
 
@@ -110,17 +95,53 @@ def eval(r, p):
         sum += err
     return sum / float(len(p))
 
-
-
-####   DON'T MODIFY ANYTHING ABOVE HERE! ENTER CODE BELOW ####
-
 #myrobot = robot()
-#myrobot.set_noise(5.0, 0.1, 5.0)  # the second exercise. 
-myrobot.set(30,50,pi/2)
-myrobot = myrobot.move(-pi/2,15)
-#print myrobot
-print myrobot.sense()
-
-#myrobot = myrobot.move(-pi/2,10)
-#print myrobot
+#myrobot.set_noise(5.0, 0.1, 5.0)
+#myrobot.set(30.0, 50.0, pi/2)
+#myrobot = myrobot.move(-pi/2, 15.0)
 #print myrobot.sense()
+#myrobot = myrobot.move(-pi/2, 10.0)
+#print myrobot.sense()
+
+####   DON'T MODIFY ANYTHING ABOVE HERE! ENTER/MODIFY CODE BELOW ####
+myrobot = robot()
+myrobot = myrobot.move(0.1, 5.0)
+Z = myrobot.sense()
+N = 1000
+T = 10 #Leave this as 10 for grading purposes.
+
+p = []
+for i in range(N):
+    r = robot()
+    r.set_noise(0.05, 0.05, 5.0)
+    p.append(r)
+
+print eval(myrobot, p)
+
+for t in range(T):
+    myrobot = myrobot.move(0.1, 5.0)
+    Z = myrobot.sense()
+
+    p2 = []
+    for i in range(N):
+        p2.append(p[i].move(0.1, 5.0))
+    p = p2
+
+    w = []
+    for i in range(N):
+        w.append(p[i].measurement_prob(Z))
+
+    p3 = []
+    index = int(random.random() * N)
+    beta = 0.0
+    mw = max(w)
+    for i in range(N):
+        beta += random.random() * 2.0 * mw
+        while beta > w[index]:
+            beta -= w[index]
+            index = (index + 1) % N
+        p3.append(p[index])
+    p = p3
+    #enter code here, make sure that you output 10 print statements.
+    print eval(myrobot, p)
+

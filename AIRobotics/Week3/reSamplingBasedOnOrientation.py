@@ -1,23 +1,16 @@
-# Make a robot called myrobot that starts at
-# coordinates 30, 50 heading north (pi/2).
-# Have your robot turn clockwise by pi/2, move
-# 15 m, and sense. Then have it turn clockwise
-# by pi/2 again, move 10 m, and sense again.
-#
-# Your program should print out the result of
-# your two sense measurements.
-#
-# Don't modify the code below. Please enter
-# your code at the bottom.
+# In this exercise, try to write a program that
+# will resample particles according to their weights.
+# Particles with higher weights should be sampled
+# more frequently (in proportion to their weight).
+
+# Don't modify anything below. Please scroll to the 
+# bottom to enter your code.
 
 from math import *
 import random
 
-
-
 landmarks  = [[20.0, 20.0], [80.0, 80.0], [20.0, 80.0], [80.0, 20.0]]
 world_size = 100.0
-
 
 class robot:
     def __init__(self):
@@ -94,33 +87,61 @@ class robot:
             prob *= self.Gaussian(dist, self.sense_noise, measurement[i])
         return prob
     
-    
-    
     def __repr__(self):
         return '[x=%.6s y=%.6s orient=%.6s]' % (str(self.x), str(self.y), str(self.orientation))
 
 
-
-def eval(r, p):
-    sum = 0.0;
-    for i in range(len(p)): # calculate mean error
-        dx = (p[i].x - r.x + (world_size/2.0)) % world_size - (world_size/2.0)
-        dy = (p[i].y - r.y + (world_size/2.0)) % world_size - (world_size/2.0)
-        err = sqrt(dx * dx + dy * dy)
-        sum += err
-    return sum / float(len(p))
-
-
-
-####   DON'T MODIFY ANYTHING ABOVE HERE! ENTER CODE BELOW ####
-
 #myrobot = robot()
-#myrobot.set_noise(5.0, 0.1, 5.0)  # the second exercise. 
-myrobot.set(30,50,pi/2)
-myrobot = myrobot.move(-pi/2,15)
-#print myrobot
-print myrobot.sense()
-
-#myrobot = myrobot.move(-pi/2,10)
-#print myrobot
+#myrobot.set_noise(5.0, 0.1, 5.0)
+#myrobot.set(30.0, 50.0, pi/2)
+#myrobot = myrobot.move(-pi/2, 15.0)
 #print myrobot.sense()
+#myrobot = myrobot.move(-pi/2, 10.0)
+#print myrobot.sense()
+
+myrobot = robot()
+N = 1000
+T = 2  #if we have large T, then orientation shall be very close. 
+p = []
+for i in range(N):
+    x = robot()
+    x.set_noise(0.05, 0.05, 5.0)
+    p.append(x)
+
+for t in range(T):
+    
+    myrobot = myrobot.move(0.1, 5.0)
+    Z = myrobot.sense()
+    
+    p2 = []
+    for i in range(N):
+        p2.append(p[i].move(0.1, 5.0))
+    p = p2
+    
+    w = []
+    for i in range(N):
+        w.append(p[i].measurement_prob(Z))
+    
+    p3 = []
+    maxw = max(w)
+    idx = int(random.random() * N)
+    beta = 0.0
+    
+    for i in range(N):
+        beta += random.random()*2.0*maxw
+        while w[idx] < beta:
+            beta -= w[idx]
+            idx = (idx + 1) % N
+        p3.append(p[idx])
+            
+    p = p3
+
+
+for i in range(N):
+    print p[i]
+    
+# check printed x and y, they are in a narrowed range. 
+
+
+
+
