@@ -72,7 +72,11 @@ def compute_value(grid,goal,cost):
     
     return value 
 
-
+grid1 = [[0, 1, 0, 0, 0, 0],
+        [0, 1, 1, 0, 1, 0],
+        [0, 0, 0, 0, 1, 0],
+        [0, 1, 1, 1, 1, 0],
+        [0, 1, 0, 1, 1, 0]]
 result = compute_value(grid, goal, cost)
 for l in result:
     print l
