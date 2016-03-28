@@ -101,19 +101,6 @@ def optimum_policy2D():
                                     policy[orientation][x][y] = action_name[a]
                                     change = True
 
-                                print "[%d,%d], o1=%d, o2=%d, action=%s, v1=%d, v2=%d" %(x,y,orientation, o2,action_name[a], value[orientation][x][y],value[o2][x2][y2]  )
-#                                c = 0                                
-#                                for m in policy:
-#                                    print "---o%d---" %c
-#                                    for n in m:
-#                                        print n
-#                                    c=c+1
-#                                c = 0                                        
-#                                for m in value:
-#                                    print "---v%d---" %c
-#                                    for n in m:
-#                                        print n
-#                                    c=c+1
     
     x = init[0]
     y = init[1]
