@@ -15,9 +15,10 @@ import edu.princeton.cs.algs4.StdOut;
 public class ABC {
     
     public static void main(String[] args){
-        for (int n = 0; n < 100; n++){
-            StdOut.println(n + " " + F(n));
-        }
+        int a = 250;
+        float b = 400;
+        float c = a/b;
+        StdOut.println(c);
 
 
     }
