@@ -1,0 +1,14 @@
+Or each file individually:
+
+README.txt
+train.m
+raw_sentences.txt
+fprop.m
+word_distance.m
+display_nearest_words.m
+predict_next_word.m
+load_data.m
+data.mat
+The starter code implements a basic framework for training neural nets with mini-batch gradient descent. Your job is to write code to complete the implementation of forward and back propagation. See the README file for a description of the dataset, starter code and how to run it.
+
+This sample_output shows you what output to expect once everything is implemented correctly.
