@@ -16,7 +16,7 @@ function [train_input, train_target, valid_input, valid_target, test_input, test
 load data.mat;
 numdims = size(data.trainData, 1);
 D = numdims - 1;
-M = floor(size(data.trainData, 2) / N);
+M = floor(size(data.trainData, 2) / N);   
 train_input = reshape(data.trainData(1:D, 1:N * M), D, N, M);
 train_target = reshape(data.trainData(D + 1, 1:N * M), 1, N, M);
 valid_input = data.validData(1:D, :);
@@ -25,3 +25,11 @@ test_input = data.testData(1:D, :);
 test_target = data.testData(D + 1, :);
 vocab = data.vocab;
 end
+
+
+% floor(x) Return the largest integer not greater than x.
+
+% reshape
+% reshape ([1, 2, 3, 4], 2, 2)
+%       ⇒  1  3
+%           2  4
