@@ -170,6 +170,8 @@ function ret = loss(model, data, wd_coefficient)
   log_class_prob = class_input - repmat(class_normalizer, [size(class_input, 1), 1]); % log of probability of each class. size: <number of classes, i.e. 10> by <number of data cases>
   class_prob = exp(log_class_prob); % probability of each class. Each column (i.e. each case) sums to 1. size: <number of classes, i.e. 10> by <number of data cases>
   
+  
+  % Cost Function = cross entropy + weight decay = classification_loss + wd_loss 
   classification_loss = -mean(sum(log_class_prob .* data.targets, 1)); % select the right log class probability using that sum; then take the mean over all data cases.
   wd_loss = sum(model_to_theta(model).^2)/2*wd_coefficient; % weight decay loss. very straightforward: E = 1/2 * wd_coeffecient * theta^2
   ret = classification_loss + wd_loss;
@@ -179,12 +181,59 @@ function ret = d_loss_by_d_model(model, data, wd_coefficient)
 
   % The returned object is supposed to be exactly like parameter <model>, 
   % i.e. it has fields ret.input_to_hid and ret.hid_to_class. 
-  %However, the contents of those matrices are gradients 
-  %(d loss by d model parameter), instead of model parameters.
-	 
-  % This is the only function that you're expected to change. Right now, it just returns a lot of zeros, which is obviously not the correct output. Your job is to replace that by a correct computation.
-  ret.input_to_hid = model.input_to_hid * 0;
-  ret.hid_to_class = model.hid_to_class * 0;
+  % However, the contents of those matrices are gradients 
+  % (d loss by d model parameter), instead of model parameters.
+  
+  % FF
+  
+  % (each record of X1 has 256 units)
+  % (assumption, say we have 20 unit in hidden layer). 
+  % (we have 10 units in classification layer)
+  
+  % X1 = data.inputs  256 x 1000
+  % W1 = model.input_to_hid  20 x 256
+  % Z1 = W1 * X1 = hid_input  20 x 1000
+  hid_input = model.input_to_hid * data.inputs; % input to the hidden units, i.e. before the logistic. size: <number of hidden units> by <number of data cases>
+  % X2 = sigmoid(Z1) = hid_output   20 x 1000
+  hid_output = logistic(hid_input); % output of the hidden units, i.e. after the logistic. size: <number of hidden units> by <number of data cases>
+  % W2 = model.hid_to_class 10 x 20
+  % Z2 = W2 * X2 = class_input 10 x 1000
+  class_input = model.hid_to_class * hid_output; % input to the components of the softmax. size: <number of classes, i.e. 10> by <number of data cases>
+  % Y = softmax(Z2) = class_prob 10 x 1000
+  
+  % log(sum(exp of class_input)) is what we subtract to get properly normalized log class probabilities. 
+  % size: <1> by <number of data cases>
+  class_normalizer = log_sum_exp_over_rows(class_input); 
+  % log of probability of each class. 
+  % size: <number of classes, i.e. 10> by <number of data cases>
+  log_class_prob = class_input - repmat(class_normalizer, [size(class_input, 1), 1]); 
+  % probability of each class. Each column (i.e. each case) sums to 1. 
+  % size: <number of classes, i.e. 10> by <number of data cases>
+  class_prob = exp(log_class_prob); 
+  
+  
+  % BP
+  % Cost Function = cross entropy + weight decay = classification_loss + wd_loss 
+ 
+  % d(CE)/d(W2) = d(CE)/d(Z2) x d(Z2)/d(X2) = (y-t) * X2'
+  d_CE_d_W2 = (class_prob - data.targets) * hid_output';
+  % d(WD)/d(W2) = wd_coeffecient*W2
+  d_WD_d_W2 = wd_coefficient * model.hid_to_class;
+  
+  
+  % d(CE)/d(W1) = d(CE)/d(Z2) x d(Z2)/d(X2) x d(X2)/d(Z1) x d(Z1)/d(W1) = (y-t) * W2 * X2 * (1-X2) * X1
+  d_CE_d_W1 = model.hid_to_class' * (class_prob - data.targets) .* (hid_output - hid_output.^2) * data.inputs';
+  % d_CE_d_W1 = ((class_prob - data.targets)' * model.hid_to_class * hid_output * ( ones(size(hid_output))- hid_output)')' * data.inputs';
+  % d(WD)/d(W1) = wd_coeffecient*W1
+  d_WD_d_W1 = wd_coefficient * model.input_to_hid;
+  
+  m = size(data.inputs,2);
+
+  ret.input_to_hid = d_CE_d_W1/m + d_WD_d_W1;
+  ret.hid_to_class = d_CE_d_W2/m + d_WD_d_W2;
+  %ret.input_to_hid = model.input_to_hid * 0;
+  %ret.hid_to_class = model.hid_to_class * 0;  
+  
 end
 
 
