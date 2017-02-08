@@ -14,8 +14,8 @@ y = np.matrix([[0,1],
 y = y.T
 
 
-bpnn1 = neural_network_with_one_hidden_layer(2,6,2)
-for i in range(10000):
+bpnn1 = neural_network_with_one_hidden_layer(2,6,2,learning_rate=0.8)
+for i in range(5000):
     n = np.random.randint(0,4)
     tr_x = x[:,n]
     tr_y = y[:,n]
