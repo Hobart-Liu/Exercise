@@ -52,18 +52,18 @@ for i in range(4):
                                  min_samples_leaf=1,
                                  max_features='sqrt',
                                  n_jobs=4,
-                                 verbose=1)
+                                 verbose=0)
 
     start_time = time.time()
 
     clf.fit(x_train, y_train[:, i])
 
     elapsed_time = time.time() - start_time
-    print("\nComplete", time.strftime("%H:%M:%S", time.gmtime(elapsed_time)))
+    print("\nComponent {} Complete: Time elapsed {}".format(i,  time.strftime("%H:%M:%S", time.gmtime(elapsed_time))))
 
 
     y_pred = clf.predict(x_test)
-    print(clf.score(x_test, y_test[:, i]))
+    print("Accuracy is {}".format(clf.score(x_test, y_test[:, i])))
     print("Confusion Matrix")
     print(confusion_matrix(y_true=y_test[:, i], y_pred=y_pred))
 
