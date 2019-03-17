@@ -3,7 +3,7 @@ import pandas as pd
 from multiprocessing import Pool
 
 import gc
-from arch import time
+import time
 
 pd.set_option('display.max_columns', 999)
 

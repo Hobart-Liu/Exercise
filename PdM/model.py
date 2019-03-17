@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 
-from arch import time
+import time
 
 pd.set_option('display.max_columns', 999)
 
